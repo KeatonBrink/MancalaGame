@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package mancala;
+
+service MancalaService {
+    rpc MakeMove(MoveRequest) returns (MoveResponse);
+    rpc RequestUpdate(UpdateRequest) returns (UpdateResponse);
+}
+
+
+message MoveRequest {
+    int32 pitIndex = 1;
+    string userHash = 2;
+}
+
+message MoveResponse {
+    string message = 1;
+    string board = 2;
+}
+
+message UpdateRequest {
+    string userHash = 1;
+}
+
+message UpdateResponse {
+    string message = 1;
+    string board = 2;
+}
