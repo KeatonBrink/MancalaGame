@@ -1,4 +1,4 @@
-module github.com/KeatonBrink/MancalaGame
+module github.com/KeatonBrink/MancalaGame/src
 
 go 1.20
 
