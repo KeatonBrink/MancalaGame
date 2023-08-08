@@ -1,10 +1,21 @@
 syntax = "proto3";
 
+// Required by protoc to generate code
+option go_package = "github.com/KeatonBrink/MancalaGame/src/protos";
 package mancala;
 
 service MancalaService {
+    rpc GameHandshake(HandshakeRequest) returns (HandshakeResponse);
     rpc MakeMove(MoveRequest) returns (MoveResponse);
     rpc RequestUpdate(UpdateRequest) returns (UpdateResponse);
+}
+
+message HandshakeRequest {
+    string userName = 1;
+}
+
+message HandshakeResponse {
+    string message = 1;
 }
 
 
