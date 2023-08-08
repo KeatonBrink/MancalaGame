@@ -21,7 +21,7 @@ type server struct {
 }
 
 func (s *server) GameHandshake(ctx context.Context, in *man.HandshakeRequest) (*man.HandshakeResponse, error) {
-	log.Printf("Received: %v", in.GetName())
+	log.Printf("Received: %v", in.GetUserName())
 	return &man.HandshakeResponse{Message: "Hello " + in.GetUserName()}, nil
 }
 
@@ -32,7 +32,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	man.RegisterGreeterServer(s, &server{})
+	man.RegisterMancalaServiceServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
