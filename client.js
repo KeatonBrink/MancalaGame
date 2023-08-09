@@ -3,16 +3,7 @@ var PROTO_PATH = __dirname + '/src/protos/mancala.proto';
 
 var parseArgs = require('minimist');
 var grpc = require('@grpc/grpc-js');
-var protoLoader = require('@grpc/proto-loader');
-var packageDefinition = protoLoader.loadSync(
-    PROTO_PATH,
-    {keepCase: true,
-     longs: String,
-     enums: String,
-     defaults: true,
-     oneofs: true
-    });
-var mancala_proto = grpc.loadPackageDefinition(packageDefinition).mancala
+
 
 function main() {
   var argv = parseArgs(process.argv.slice(2), {

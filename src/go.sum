@@ -1,3 +1,5 @@
+github.com/KeatonBrink/MancalaGame/src v0.0.0-20230808004127-f8322e4f4876 h1:ejK8xktCqgpUjsECLNACoYUvX5qbbsIr9rqzfOOT3ZU=
+github.com/KeatonBrink/MancalaGame/src v0.0.0-20230808004127-f8322e4f4876/go.mod h1:u9DhSQ94aV+DhtW5T6jWGM5ecdP0mwBgyYrM5ayyhgY=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg=
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
