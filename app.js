@@ -77,6 +77,7 @@
 //     }
 //   });
 
+// Proto requires
 var parseArgs = require('minimist');
 var messages = require('./src/protos/generated/mancala_pb');
 var services = require('./src/protos/generated/mancala_grpc_pb');
