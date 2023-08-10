@@ -62,17 +62,33 @@
 //   console.log('Greeting:', response.getMessage());
 // });
 
-import { MancalaServiceClient } from './src/protos/mancala_grpc_web_pb.js';
+// import { MancalaServiceClient } from './src/protos/mancala_grpc_web_pb.js';
 
-const client = new MancalaServiceClient('http://localhost:8080');
+// const client = new MancalaServiceClient('http://localhost:8080');
 
-  const request = new HelloRequest();
-  request.setName('World');
+// const request = new HelloRequest();
+// request.setName('World');
 
-  client.sayHello(request, {}, (err, response) => {
+// client.sayHello(request, {}, (err, response) => {
+// if (err) {
+//     console.error('gRPC-Web Error:', err);
+// } else {
+//     console.log('gRPC-Web Response:', response.getMessage());
+// }
+// });
+
+const {HandshakeRequest, HandshakeResponse} = require('./src/protos/mancala_pb.js');
+const {MancalaServiceClient} = require('./src/protos/mancala_grpc_web_pb.js');
+
+var mancalaService = new MancalaServiceClient('http://localhost:8080');
+
+var request = new HandshakeRequest();
+request.setName('Keaton');
+
+mancalaService.sayHello(request, {}, function(err, response) {
     if (err) {
-      console.error('gRPC-Web Error:', err);
+        console.error('gRPC-Web Error:', err);
     } else {
-      console.log('gRPC-Web Response:', response.getMessage());
+        console.log('gRPC-Web Response:', response.getMessage());
     }
-  });
+});
