@@ -62,17 +62,49 @@
 //   console.log('Greeting:', response.getMessage());
 // });
 
-import { MancalaServiceClient } from './src/protos/mancala_grpc_web_pb.js';
+// const MancalaServiceClient =  require('./src/protos/mancala_grpc_web_pb.js');
 
-const client = new MancalaServiceClient('http://localhost:8080');
+// const client = new MancalaServiceClient('http://localhost:8080');
 
-  const request = new HelloRequest();
-  request.setName('World');
+//   const request = new HelloRequest();
+//   request.setName('World');
 
-  client.sayHello(request, {}, (err, response) => {
-    if (err) {
-      console.error('gRPC-Web Error:', err);
-    } else {
-      console.log('gRPC-Web Response:', response.getMessage());
-    }
+//   client.sayHello(request, {}, (err, response) => {
+//     if (err) {
+//       console.error('gRPC-Web Error:', err);
+//     } else {
+//       console.log('gRPC-Web Response:', response.getMessage());
+//     }
+//   });
+
+var parseArgs = require('minimist');
+var messages = require('./src/protos/generated/mancala_pb');
+var services = require('./src/protos/generated/mancala_grpc_pb');
+
+var grpc = require('@grpc/grpc-js');
+
+function main() {
+  var argv = parseArgs(process.argv.slice(2), {
+    string: 'target'
   });
+  var target;
+  if (argv.target) {
+    target = argv.target;
+  } else {
+    target = 'localhost:50051';
+  }
+  var client = new services.MancalaServiceClient(target, grpc.credentials.createInsecure());
+  var request = new messages.HandshakeRequest();
+  var user;
+  if (argv._.length > 0) {
+    user = argv._[0]; 
+  } else {
+    user = 'world';
+  }
+  request.setUsername(user);
+  client.gameHandshake(request, function(err, response) {
+    console.log('Greeting:', response.getMessage());
+  });
+}
+
+main();
