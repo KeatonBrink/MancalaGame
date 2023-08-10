@@ -1,89 +1,74 @@
-// var PROTO_PATH = 'src/protos/route_guide.proto';
-// var grpc = require('@grpc/grpc-js');
-// var protoLoader = require('@grpc/proto-loader');
-// // Suggested options for similarity to existing grpc.load behavior
-// var packageDefinition = protoLoader.loadSync(
-//     PROTO_PATH,
-//     {keepCase: true,
-//      longs: String,
-//      enums: String,
-//      defaults: true,
-//      oneofs: true
-//     });
-// var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
-// // The protoDescriptor object has the full package hierarchy
-// var routeguide = protoDescriptor.routeguide;
-
-// let board = [
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0]
-// ]
-
-// const basicBoard = [
-//     [0, 4, 4, 4, 4, 4, 4],
-//     [4, 4, 4, 4, 4, 4, 0]
-// ]
-
-// let currentPlayer = 1
-
-// console.log("hello world")
-// const pits = document.querySelectorAll('.mancala-pit')
-
-// pits.forEach((pit, index) => {
-//     pit.addEventListener('click', () => {
-//         console.log('Pit: ', index)
-//         // Send a gRPC request to your Go back-end with the clicked pit index
-//         // grpcClient.makeMove({ pitIndex: index }, (error, response) => {
-//         //     if (error) {
-//         //         console.error('Error making move:', error);
-//         //     } else {
-//         //         console.log('Move successful:', response.message);
-//         //         // Update the UI based on the response from the back-end
-//         //     }
-//         // });
-//     });
-// });
-// import * as mancala from './src/protos/mancala_pb.js';
-// import * as MancalaServiceClient from './src/protos/mancala_grpc_web_pb.js';
-
-// // Create a gRPC-Web client
-// const client = new MancalaServiceClient.MancalaServiceClient('http://localhost:50051');
-
-// // Prepare the request
-// var request = new mancala.HandshakeRequest();
-// request.setUserName('world');
-
-// // Call the GameHandshake method using gRPC-Web
-// client.gameHandshake(request, {}, (err, response) => {
-//   if (err) {
-//     console.error('Error:', err);
-//     return;
-//   }
-//   console.log('Greeting:', response.getMessage());
-// });
-
-// const MancalaServiceClient =  require('./src/protos/mancala_grpc_web_pb.js');
-
-// const client = new MancalaServiceClient('http://localhost:8080');
-
-//   const request = new HelloRequest();
-//   request.setName('World');
-
-//   client.sayHello(request, {}, (err, response) => {
-//     if (err) {
-//       console.error('gRPC-Web Error:', err);
-//     } else {
-//       console.log('gRPC-Web Response:', response.getMessage());
-//     }
-//   });
-
 // Proto requires
 var parseArgs = require('minimist');
 var messages = require('./src/protos/generated/mancala_pb');
 var services = require('./src/protos/generated/mancala_grpc_pb');
-
 var grpc = require('@grpc/grpc-js');
 
+// File serving requirments
+const http = require('http');
+const fs = require('fs');
+
+//Front facing server
+const server = http.createServer((req, res) => {
+    if (req.method === 'GET' && req.url === '/') {
+      fs.readFile('src/static/index.html', (err, data) => {
+          if (err) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Internal Server Error');
+          } else {
+              res.writeHead(200, { 'Content-Type': 'text/html' });
+              res.end(data);
+          }
+      });
+    } else if (req.method === 'GET' && req.url === '/client.js') {
+      fs.readFile('src/static/client.js', (err, data) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Internal Server Error');
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/javascript' });
+            res.end(data);
+        }
+      });
+    } else if (req.method === 'GET' && req.url === '/style.css') {
+      fs.readFile('src/static/style.css', (err, data) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Internal Server Error');
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/css' });
+            res.end(data);
+        }
+      }); 
+    } else if (req.method === 'POST' && req.url === '/hello') {
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const data = JSON.parse(body);
+            const value = data.pitIndex;
+            let message = '';
+            if (value >= 0 && value < 12) {
+                message = 'Hello World ' + value;
+            } else {
+                message = 'Invalid value';
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message }));
+        });
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+    }
+});
+
+const port = 3000;
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
+
+// Back facing server components
 function main() {
   var argv = parseArgs(process.argv.slice(2), {
     string: 'target'

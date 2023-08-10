@@ -18,7 +18,7 @@ pits.forEach((pit, index) => {
     pit.addEventListener('click', () => {
         console.log('Pit: ', index)
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/hello ' + index, true)
+        xhr.open('POST', '/hello', true)
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
@@ -26,7 +26,7 @@ pits.forEach((pit, index) => {
                 console.log(response.message)
             }
         };
-        xhr.send(JSON.stringify({ index }));
+        xhr.send(JSON.stringify({ pitIndex: index }));
     });
                     // Send a gRPC request to your Go back-end with the clicked pit index
         // grpcClient.makeMove({ pitIndex: index }, (error, response) => {
