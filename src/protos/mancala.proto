@@ -15,7 +15,10 @@ message HandshakeRequest {
 }
 
 message HandshakeResponse {
-    string message = 1;
+    int32 errorCode = 1;
+    string errorMessage = 2;
+    string message = 3;
+    string serverWebSocketAddress = 4;
 }
 
 

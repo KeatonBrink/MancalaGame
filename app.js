@@ -8,55 +8,125 @@ var grpc = require('@grpc/grpc-js');
 const http = require('http');
 const fs = require('fs');
 
+// Back facing server components
+var client
+var request
+function initBackendCommunication() {
+  var argv = parseArgs(process.argv.slice(2), {
+    string: 'target'
+  });
+  var target;
+  if (argv.target) {
+    target = argv.target;
+  } else {
+    target = 'localhost:50051';
+  }
+  client = new services.MancalaServiceClient(target, grpc.credentials.createInsecure());
+  // var request = new messages.HandshakeRequest();
+  // var user;
+  // if (argv._.length > 0) {
+  //   user = argv._[0]; 
+  // } else {
+  //   user = 'world';
+  // }
+  // request.setUsername(user);
+  // client.gameHandshake(request, function(err, response) {
+  //   console.log('Greeting:', response.getMessage());
+  // });
+}
+initBackendCommunication();
+
+//In Progress
+function findGame(UserName) {
+  request = new messages.HandShakeRequest();
+  request.setUsername(UserName)
+  client.gameHandshake(request, function(err, response) {
+    if (err) {
+      // TODO: Should probably display error to user
+      console.log(err)
+      return err
+    } else {
+      
+    }
+  })
+}
+
+
 //Front facing server
 const server = http.createServer((req, res) => {
-    if (req.method === 'GET' && req.url === '/') {
-      fs.readFile('src/static/index.html', (err, data) => {
-          if (err) {
-              res.writeHead(500, { 'Content-Type': 'text/plain' });
-              res.end('Internal Server Error');
+  // Static file server
+  // Get index.html
+  if (req.method === 'GET' && req.url === '/') {
+    fs.readFile('src/static/index.html', (err, data) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Internal Server Error');
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(data);
+        }
+    });
+  // Get client.js
+  } else if (req.method === 'GET' && req.url === '/client.js') {
+    fs.readFile('src/static/client.js', (err, data) => {
+      if (err) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Internal Server Error');
+      } else {
+          res.writeHead(200, { 'Content-Type': 'text/javascript' });
+          res.end(data);
+      }
+    });
+  // Get style.css
+  } else if (req.method === 'GET' && req.url === '/style.css') {
+    fs.readFile('src/static/style.css', (err, data) => {
+      if (err) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Internal Server Error');
+      } else {
+          res.writeHead(200, { 'Content-Type': 'text/css' });
+          res.end(data);
+      }
+    }); 
+
+    // Ajax incoming request
+    // Send a move request to server
+    // TODO:  Finish implementation
+  } else if (req.method === 'POST' && req.url === '/MakeMove') {
+      let body = '';
+      req.on('data', (chunk) => {
+          body += chunk.toString();
+      });
+      req.on('end', () => {
+          const data = JSON.parse(body);
+          const value = data.pitIndex;
+          let message = '';
+          if (value >= 0 && value < 12) {
+              message = 'Hello World ' + value;
           } else {
-              res.writeHead(200, { 'Content-Type': 'text/html' });
-              res.end(data);
+              message = 'Invalid value';
           }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ message }));
       });
-    } else if (req.method === 'GET' && req.url === '/client.js') {
-      fs.readFile('src/static/client.js', (err, data) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Internal Server Error');
+      // Find game to join
+  } else if (req.method === 'POST' && req.url === '/FindGame') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+  });
+    req.on('end', () => {
+        const data = JSON.parse(body);
+        const userName = data.userName;
+        let message = '';
+        if (value >= 0 && value < 12) {
+            message = 'Hello World ' + val;
         } else {
-            res.writeHead(200, { 'Content-Type': 'text/javascript' });
-            res.end(data);
+            message = 'Invalid value';
         }
-      });
-    } else if (req.method === 'GET' && req.url === '/style.css') {
-      fs.readFile('src/static/style.css', (err, data) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Internal Server Error');
-        } else {
-            res.writeHead(200, { 'Content-Type': 'text/css' });
-            res.end(data);
-        }
-      }); 
-    } else if (req.method === 'POST' && req.url === '/hello') {
-        let body = '';
-        req.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-        req.on('end', () => {
-            const data = JSON.parse(body);
-            const value = data.pitIndex;
-            let message = '';
-            if (value >= 0 && value < 12) {
-                message = 'Hello World ' + value;
-            } else {
-                message = 'Invalid value';
-            }
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message }));
-        });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message }));
+    });
     } else {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found');
@@ -68,29 +138,4 @@ server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
 
-// Back facing server components
-function main() {
-  var argv = parseArgs(process.argv.slice(2), {
-    string: 'target'
-  });
-  var target;
-  if (argv.target) {
-    target = argv.target;
-  } else {
-    target = 'localhost:50051';
-  }
-  var client = new services.MancalaServiceClient(target, grpc.credentials.createInsecure());
-  var request = new messages.HandshakeRequest();
-  var user;
-  if (argv._.length > 0) {
-    user = argv._[0]; 
-  } else {
-    user = 'world';
-  }
-  request.setUsername(user);
-  client.gameHandshake(request, function(err, response) {
-    console.log('Greeting:', response.getMessage());
-  });
-}
 
-main();
