@@ -11,14 +11,14 @@ const basicBoard = [
 
 let currentPlayer = 1
 
-console.log("hello world")
+const statusText = document.querySelector('#status-text')
 const pits = document.querySelectorAll('.mancala-pit')
 
 pits.forEach((pit, index) => {
     pit.addEventListener('click', () => {
         console.log('Pit: ', index)
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/hello', true)
+        xhr.open('POST', '/MakeMove', true)
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
@@ -38,3 +38,25 @@ pits.forEach((pit, index) => {
         //     }
         // });
 });
+
+const userNameSubmission = document.querySelector('#user-name-submission')
+const userName = document.querySelector('#user-name')
+
+userNameSubmission.addEventListener('click', () => {
+    if (userName.length == 0) {
+        statusText.textContent = 'Username must be at least one character long!'
+        return
+    }
+    statusText.textContent = 'Attempting to join game'
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/FindGame', true)
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            console.log(JSON.stringify(response))
+            statusText.textContent = 'Server Responded! Check console'
+        }
+    };
+    xhr.send(JSON.stringify({ userName: userName }));
+})

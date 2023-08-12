@@ -44,10 +44,8 @@ function findGame(UserName) {
     if (err) {
       // TODO: Should probably display error to user
       console.log(err)
-      return err
-    } else {
-      
     }
+    return response
   })
 }
 
@@ -118,9 +116,14 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
         const data = JSON.parse(body);
         const userName = data.userName;
-        let message = '';
-        if (value >= 0 && value < 12) {
-            message = 'Hello World ' + val;
+        if (userName.length > 0) {
+            res = findGame(userName)
+            // TODO: I should probably expand the possible errors
+            if (res.getErrorCode != 0) {
+              message = 'Error Please Try Again: ' + res.getErrorMessage
+            } else {
+              message = res
+            }
         } else {
             message = 'Invalid value';
         }

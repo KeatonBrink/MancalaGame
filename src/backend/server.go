@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 
 	man "github.com/KeatonBrink/MancalaGame/src/protos"
 	"google.golang.org/grpc"
@@ -18,11 +19,59 @@ var (
 // server is used to implement helloworld.GreeterServer.
 type server struct {
 	man.UnimplementedMancalaServiceServer
+	waitingRoom    []string
+	allUserNames   []string
+	gameInProgress []MancalaGameBoard
+	mu             sync.Mutex
 }
 
-func (s *server) GameHandshake(ctx context.Context, in *man.HandshakeRequest) (*man.HandshakeResponse, error) {
-	log.Printf("Received: %v", in.GetUserName())
-	return &man.HandshakeResponse{Message: "Hello " + in.GetUserName()}, nil
+type MancalaGameBoard struct {
+	p1Name string
+	p1Row  [7]int
+	p2Name string
+	p2Row  [7]int
+}
+
+func (mgb *MancalaGameBoard) resetBoard() {
+	for i := 0; i < 6; i++ {
+		mgb.p1Row[i] = 4
+		mgb.p2Row[i] = 4
+	}
+	mgb.p1Row[6] = 0
+	mgb.p2Row[6] = 0
+}
+
+func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (*man.HandshakeResponse, error) {
+	log.Printf("Received: %v", req.GetUserName())
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, v := range s.allUserNames {
+		if v == req.GetUserName() {
+			return &man.HandshakeResponse{
+				ErrorCode:              1,
+				ErrorMessage:           "Name already in use",
+				Messsage:               "",
+				ServerWebSocketAddress: "",
+			}, nil
+		}
+	}
+	s.allUserNames = append(s.allUserNames, req.GetUserName())
+	if len(s.waitingRoom) > 0 {
+		return &man.HandshakeResponse{
+			ErrorCode:              0,
+			ErrorMessage:           "",
+			Message:                "Game Starting Soon",
+			ServerWebSocketAddress: "",
+		}, nil
+	} else {
+		s.waitingRoom = append(s.waitingRoom, req.GetUserName())
+		return &man.HandshakeResponse{
+			ErrorCode:              0,
+			ErrorMessage:           "",
+			Message:                "Waiting for Second Player",
+			ServerWebSocketAddress: "8081",
+		}, nil
+	}
 }
 
 func main() {
