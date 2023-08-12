@@ -50,7 +50,7 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 			return &man.HandshakeResponse{
 				ErrorCode:              1,
 				ErrorMessage:           "Name already in use",
-				Messsage:               "",
+				Message:                "",
 				ServerWebSocketAddress: "",
 			}, nil
 		}
