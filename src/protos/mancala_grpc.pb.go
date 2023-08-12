@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: protos/mancala.proto
+// source: mancala.proto
 
 package protos
 
@@ -173,5 +173,5 @@ var MancalaService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protos/mancala.proto",
+	Metadata: "mancala.proto",
 }

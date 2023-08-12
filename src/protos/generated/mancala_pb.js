@@ -1,4 +1,4 @@
-// source: src/protos/mancala.proto
+// source: mancala.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -315,7 +315,10 @@ proto.mancala.HandshakeResponse.prototype.toObject = function(opt_includeInstanc
  */
 proto.mancala.HandshakeResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    message: jspb.Message.getFieldWithDefault(msg, 1, "")
+    errorcode: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    errormessage: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    message: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    serverwebsocketaddress: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -353,8 +356,20 @@ proto.mancala.HandshakeResponse.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setErrorcode(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setErrormessage(value);
+      break;
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setServerwebsocketaddress(value);
       break;
     default:
       reader.skipField();
@@ -385,10 +400,31 @@ proto.mancala.HandshakeResponse.prototype.serializeBinary = function() {
  */
 proto.mancala.HandshakeResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getErrorcode();
+  if (f !== 0) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+  f = message.getErrormessage();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getMessage();
   if (f.length > 0) {
     writer.writeString(
-      1,
+      3,
+      f
+    );
+  }
+  f = message.getServerwebsocketaddress();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
       f
     );
   }
@@ -396,11 +432,47 @@ proto.mancala.HandshakeResponse.serializeBinaryToWriter = function(message, writ
 
 
 /**
- * optional string message = 1;
+ * optional int32 errorCode = 1;
+ * @return {number}
+ */
+proto.mancala.HandshakeResponse.prototype.getErrorcode = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.mancala.HandshakeResponse} returns this
+ */
+proto.mancala.HandshakeResponse.prototype.setErrorcode = function(value) {
+  return jspb.Message.setProto3IntField(this, 1, value);
+};
+
+
+/**
+ * optional string errorMessage = 2;
+ * @return {string}
+ */
+proto.mancala.HandshakeResponse.prototype.getErrormessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.HandshakeResponse} returns this
+ */
+proto.mancala.HandshakeResponse.prototype.setErrormessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string message = 3;
  * @return {string}
  */
 proto.mancala.HandshakeResponse.prototype.getMessage = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
@@ -409,7 +481,25 @@ proto.mancala.HandshakeResponse.prototype.getMessage = function() {
  * @return {!proto.mancala.HandshakeResponse} returns this
  */
 proto.mancala.HandshakeResponse.prototype.setMessage = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string serverWebSocketAddress = 4;
+ * @return {string}
+ */
+proto.mancala.HandshakeResponse.prototype.getServerwebsocketaddress = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.HandshakeResponse} returns this
+ */
+proto.mancala.HandshakeResponse.prototype.setServerwebsocketaddress = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 
