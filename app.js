@@ -38,11 +38,12 @@ initBackendCommunication();
 
 //In Progress
 function findGame(UserName) {
-  request = new messages.HandShakeRequest();
+  request = new messages.HandshakeRequest();
   request.setUsername(UserName)
   client.gameHandshake(request, function(err, response) {
     if (err) {
       // TODO: Should probably display error to user
+      console.log('An Error: ')
       console.log(err)
     }
     return response
@@ -118,6 +119,8 @@ const server = http.createServer((req, res) => {
         const userName = data.userName;
         if (userName.length > 0) {
             res = findGame(userName)
+            console.log(JSON.stringify(res))
+
             // TODO: I should probably expand the possible errors
             if (res.getErrorCode != 0) {
               message = 'Error Please Try Again: ' + res.getErrorMessage
@@ -125,7 +128,7 @@ const server = http.createServer((req, res) => {
               message = res
             }
         } else {
-            message = 'Invalid value';
+            message = 'Invalid value: ' + userName + ' Length: ' + userName.length;
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message }));

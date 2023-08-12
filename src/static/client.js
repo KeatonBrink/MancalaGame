@@ -40,9 +40,12 @@ pits.forEach((pit, index) => {
 });
 
 const userNameSubmission = document.querySelector('#user-name-submission')
-const userName = document.querySelector('#user-name')
+const userNameLocation = document.getElementById('user-name')
 
 userNameSubmission.addEventListener('click', () => {
+    var userName = userNameLocation.value
+    console.log(userName)
+
     if (userName.length == 0) {
         statusText.textContent = 'Username must be at least one character long!'
         return
