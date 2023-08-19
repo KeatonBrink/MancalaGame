@@ -44,7 +44,7 @@ const userNameLocation = document.getElementById('user-name')
 
 userNameSubmission.addEventListener('click', () => {
     var userName = userNameLocation.value
-    console.log(userName)
+    console.log('Username: ' + userName)
 
     if (userName.length == 0) {
         statusText.textContent = 'Username must be at least one character long!'
@@ -58,7 +58,9 @@ userNameSubmission.addEventListener('click', () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             console.log(JSON.stringify(response))
-            statusText.textContent = 'Server Responded! Check console'
+            statusText.textContent = response.message
+        } else {
+            statusText.textContent = 'Error contacting server, try again'
         }
     };
     xhr.send(JSON.stringify({ userName: userName }));
