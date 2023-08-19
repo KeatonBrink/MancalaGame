@@ -46,8 +46,10 @@ function findGame(UserName) {
       console.log('An Error: ')
       console.log(err)
     }
+    console.log("Got a response, I think: " + JSON.parse.stringify(response))
     return response
   })
+  console.log("findGame end")
 }
 
 
@@ -113,20 +115,31 @@ const server = http.createServer((req, res) => {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk.toString();
-  });
-    req.on('end', () => {
+    });
+    req.on('end', async () => {
         const data = JSON.parse(body);
         const userName = data.userName;
         if (userName.length > 0) {
-            res = findGame(userName)
-            console.log(JSON.stringify(res))
-
-            // TODO: I should probably expand the possible errors
-            if (res.getErrorCode != 0) {
-              message = 'Error Please Try Again: ' + res.getErrorMessage
-            } else {
-              message = res
+          request = new messages.HandshakeRequest();
+          request.setUsername(userName)
+          var res
+          await client.gameHandshake(request, function(err, response) {
+            if (err) {
+              // TODO: Should probably display error to user
+              console.log('An Error: ')
+              console.log(err)
             }
+            console.log("Got a response, I think: " + JSON.parse.stringify(response))
+            res = response
+          })
+          console.log("tree " + res)
+
+          // TODO: I should probably expand the possible errors
+          if (res.getErrorcode != 0) {
+            message = 'Error Please Try Again: ' + res.getErrormessage
+          } else {
+            message = res
+          }
         } else {
             message = 'Invalid value: ' + userName + ' Length: ' + userName.length;
         }
