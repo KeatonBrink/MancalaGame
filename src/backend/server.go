@@ -6,14 +6,24 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"strconv"
 	"sync"
 
 	man "github.com/KeatonBrink/MancalaGame/src/protos"
+	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
 )
 
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all cross-origin requests
+	},
+}
+
 var (
-	port = flag.Int("port", 50051, "The server port")
+	port   = flag.Int("port", 50051, "The server port")
+	wsport = flag.Int("wsport", 8081, "The websocket port")
 )
 
 // server is used to implement helloworld.GreeterServer.
@@ -74,6 +84,31 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 	}
 }
 
+func handleWebSocket(serverObj *server, w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Error upgrading connection:", err)
+		return
+	}
+	defer conn.Close()
+
+	fmt.Println("Client connected")
+
+	for {
+		serverObj.mu.Lock()
+		if len(serverObj.allUserNames) > 1 {
+			// Send a message to the client
+			err = conn.WriteMessage(websocket.TextMessage, []byte("Opponent Found"))
+			if err != nil {
+				fmt.Println("Error sending message:", err)
+			}
+			serverObj.mu.Unlock()
+			return
+		}
+		serverObj.mu.Unlock()
+	}
+}
+
 func main() {
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
@@ -81,9 +116,19 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	man.RegisterMancalaServiceServer(s, &server{})
+	var gRPCServer server
+	go websocketSetup(&gRPCServer)
+	man.RegisterMancalaServiceServer(s, &gRPCServer)
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+func websocketSetup(serverObj *server) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		handleWebSocket(serverObj, w, r)
+	})
+	log.Printf("Websocket listening at %v", *wsport)
+	http.ListenAndServe(":"+strconv.Itoa(*wsport), nil)
 }

@@ -9,6 +9,8 @@ const basicBoard = [
     [4, 4, 4, 4, 4, 4, 0]
 ]
 
+let currentState = "Awaiting Name"
+
 let currentPlayer = 1
 
 const statusText = document.querySelector('#status-text')
@@ -59,9 +61,33 @@ userNameSubmission.addEventListener('click', () => {
             const response = JSON.parse(xhr.responseText);
             console.log(JSON.stringify(response))
             statusText.textContent = response.message
+            if (response.data.message == "Waiting for Second Player") {
+                webSocketToServer(response.data.serverWebSocketAddress)
+            }
         } else {
             statusText.textContent = 'Error contacting server, try again'
         }
     };
     xhr.send(JSON.stringify({ userName: userName }));
 })
+
+function webSocketToServer(webSocketAddress) {
+
+	let socket = new WebSocket("ws://localhost" + webSocketAddress + "/ws");
+
+    socket.onopen = () => {
+        console.log("Connected to WebSocket")
+    };
+
+    socket.onmessage = event => {
+        console.log("Received: " + event.data)
+    };
+
+    socket.onclose = event => {
+        if (event.wasClean) {
+            console.log(`Closed cleanly, code=${event.code}, reason=${event.reason}`)
+        } else {
+            console.log("Connection died")
+        }
+    };
+}
