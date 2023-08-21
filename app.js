@@ -61,11 +61,8 @@ app.post('/FindGame', async (req, res) => {
       errorMessage = 'Invalid value: ' + userName + ' Length: ' + userName.length;
     } else {
       try {
-        response = await findGame(userName);
-        console.log("Find game response here")
+        response = await findGame(userName)
         response = gameHandshakegRPCToJSON(response)
-        console.log(JSON.stringify(response))
-
       } catch (error) {
         // Handle unexpected errors
         console.error(error);
@@ -73,6 +70,7 @@ app.post('/FindGame', async (req, res) => {
     }
 
     // Send the response with the appropriate message
+    console.log('Responding to find game request: ' + userName)
     res.status(200).json({ data: response, error: errorMessage });
   } catch (error) {
     console.log(error)

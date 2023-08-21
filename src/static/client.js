@@ -72,8 +72,8 @@ userNameSubmission.addEventListener('click', () => {
 })
 
 function webSocketToServer(webSocketAddress) {
-
-	let socket = new WebSocket("ws://localhost" + webSocketAddress + "/ws");
+    let url = "ws://localhost:" + webSocketAddress + "/ws"
+	let socket = new WebSocket(url);
 
     socket.onopen = () => {
         console.log("Connected to WebSocket")
