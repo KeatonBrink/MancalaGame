@@ -11,13 +11,20 @@ const basicBoard = [
 
 let currentState = "Awaiting Name"
 
-let currentPlayer = 1
+let playerID = 1
 
 const statusText = document.querySelector('#status-text')
 const pits = document.querySelectorAll('.mancala-pit')
 
 pits.forEach((pit, index) => {
     pit.addEventListener('click', () => {
+        if (currentState != "Your Turn") {
+            return
+        } else if (board[Math.floor(index / 7)][index % 7] == 0) {
+            return
+        } else if (index < 6) {
+            return
+        }
         console.log('Pit: ', index)
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/MakeMove', true)
@@ -45,6 +52,9 @@ const userNameSubmission = document.querySelector('#user-name-submission')
 const userNameLocation = document.getElementById('user-name')
 
 userNameSubmission.addEventListener('click', () => {
+    if (currentState != "Awaiting Name") {
+        return
+    }
     var userName = userNameLocation.value
     console.log('Username: ' + userName)
 
@@ -62,7 +72,18 @@ userNameSubmission.addEventListener('click', () => {
             console.log(JSON.stringify(response))
             statusText.textContent = response.message
             if (response.data.message == "Waiting for Second Player") {
+                statusText.textContent = "Waiting for second player"
+                currentState = "Waiting for Second Player"
                 webSocketToServer(response.data.serverWebSocketAddress)
+            } else if (response.data.message == "Game Starting Soon") {
+                statusText.textContent = "Opponent found, their turn"
+                currentState = "Opponent Turn"
+                board = basicBoard
+                updateHTMLBoard()
+                playerID = 2
+            } else if (response.data.message == "Name already in use") {
+                statusText.textContent = "Name already in use, try again"
+                currentState = "Awaiting Name"
             }
         } else {
             statusText.textContent = 'Error contacting server, try again'
@@ -81,6 +102,16 @@ function webSocketToServer(webSocketAddress) {
 
     socket.onmessage = event => {
         console.log("Received: " + event.data)
+        if (event.data == "Opponent Found") {
+            statusText.textContent = "Opponent Found, Your Turn"
+            currentState = "Your Turn"
+            board = basicBoard
+            updateHTMLBoard()
+            playerID = 1
+        } else {
+            statusText.textContent = "Sever Error"
+            currentState = "Awaiting Name"
+        }
     };
 
     socket.onclose = event => {
@@ -90,4 +121,11 @@ function webSocketToServer(webSocketAddress) {
             console.log("Connection died")
         }
     };
+}
+
+const boardPits = document.querySelectorAll('.board-pit')
+function updateHTMLBoard() {
+    boardPits.forEach((pit, index) => {
+        pit.textContent = board[Math.floor(index / 7)][index % 7]
+    })
 }

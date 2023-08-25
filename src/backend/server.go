@@ -66,7 +66,8 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 		}
 	}
 	s.allUserNames = append(s.allUserNames, req.GetUserName())
-	if len(s.waitingRoom) > 0 {
+	s.waitingRoom = append(s.waitingRoom, req.GetUserName())
+	if len(s.waitingRoom) > 1 {
 		return &man.HandshakeResponse{
 			ErrorCode:              0,
 			ErrorMessage:           "",
@@ -74,7 +75,6 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 			ServerWebSocketAddress: "",
 		}, nil
 	} else {
-		s.waitingRoom = append(s.waitingRoom, req.GetUserName())
 		return &man.HandshakeResponse{
 			ErrorCode:              0,
 			ErrorMessage:           "",
@@ -96,13 +96,25 @@ func handleWebSocket(serverObj *server, w http.ResponseWriter, r *http.Request) 
 
 	for {
 		serverObj.mu.Lock()
-		if len(serverObj.allUserNames) > 1 {
+		if len(serverObj.waitingRoom) > 1 {
 			// Send a message to the client
 			err = conn.WriteMessage(websocket.TextMessage, []byte("Opponent Found"))
 			if err != nil {
 				fmt.Println("Error sending message:", err)
 			}
 			serverObj.mu.Unlock()
+			newGameBoard := MancalaGameBoard{
+				p1Name: serverObj.waitingRoom[0],
+				p2Name: serverObj.waitingRoom[1],
+			}
+			newGameBoard.resetBoard()
+			serverObj.gameInProgress = append(serverObj.gameInProgress, newGameBoard)
+			if len(serverObj.waitingRoom) > 2 {
+				serverObj.waitingRoom = serverObj.waitingRoom[2:]
+			} else {
+				serverObj.waitingRoom = []string{}
+			}
+
 			return
 		}
 		serverObj.mu.Unlock()
