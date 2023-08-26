@@ -11,7 +11,7 @@ async function findGameRoute(req, res, client) {
                 "Invalid value: " + userName + " Length: " + userName.length;
         } else {
             try {
-                response = await findGame(userName);
+                response = await findGame(userName, client);
                 response = gameHandshakegRPCToJSON(response);
             } catch (error) {
                 // Handle unexpected errors
@@ -32,7 +32,7 @@ async function findGameRoute(req, res, client) {
 }
 
 // Make the findGame function async
-async function findGame(UserName) {
+async function findGame(UserName, client) {
     return new Promise((resolve, reject) => {
         request = new messages.HandshakeRequest();
         request.setUsername(UserName);

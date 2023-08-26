@@ -4,20 +4,22 @@ var services = require("../../protos/generated/mancala_grpc_pb");
 async function makeMoveRoute(req, res, client) {
     try {
         const data = req.body;
+        console.log("Responding to make move request: " + data.userHash);
         //Prepare the request to the gRPC server
-        response = makeMove(data.userHash, data.move);
+        response = await makeMove(data.userHash, data.pitIndex, client);
         response = makeMovegRPCToJSON(response);
-        res.status(200).json({ message: "Move processed successfully" });
+        res.status(200).json({ data: response, error: "" });
     } catch (error) {
         res.status(500).json({ error: "An error occurred" });
     }
 }
 
-async function makeMove(UserHash, Move) {
+async function makeMove(UserHash, Move, client) {
     return new Promise((resolve, reject) => {
         request = new messages.MoveRequest();
+        console.log("makeMove UserHash: " + UserHash + " Move: " + Move);
+        request.setPitindex(Move);
         request.setUserhash(UserHash);
-        request.setMove(Move);
 
         client.makeMove(request, (err, response) => {
             if (err) {

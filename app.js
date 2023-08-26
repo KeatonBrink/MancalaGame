@@ -8,7 +8,7 @@ var grpc = require("@grpc/grpc-js");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-// Bring in post functions
+// Bring in post routes
 const findGameRoute = require("./src/app/routes/findGame");
 const makeMoveRoute = require("./src/app/routes/makeMove");
 
@@ -43,12 +43,12 @@ initBackendCommunication();
 
 // Refactored route for finding a game
 app.post("/FindGame", async (req, res) => {
-    findGameRoute(req, res, client);
+    await findGameRoute(req, res, client);
 });
 
 // Refactored route for making a move
-app.post("/MakeMove", (req, res) => {
-    makeMoveRoute(req, res, client);
+app.post("/MakeMove", async (req, res) => {
+    await makeMoveRoute(req, res, client);
 });
 
 // Start the server

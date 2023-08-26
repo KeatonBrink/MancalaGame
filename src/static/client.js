@@ -26,7 +26,7 @@ pits.forEach((pit, index) => {
         } else if (index < 6) {
             return;
         }
-        console.log("Pit: ", index);
+        console.log("Pit: ", index - 6);
         const xhr = new XMLHttpRequest();
         //
         xhr.open("POST", "/MakeMove", true);
@@ -34,11 +34,12 @@ pits.forEach((pit, index) => {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
-                console.log(response.message);
+                console.log(JSON.stringify(response));
             }
         };
+        console.log("client.js /Makemove User Hash: " + userHash);
         const payload = {
-            pitIndex: index,
+            pitIndex: index - 6,
             userHash: userHash,
         };
         xhr.send(JSON.stringify(payload));
@@ -98,6 +99,7 @@ function webSocketToServer(webSocketAddress) {
 
     socket.onopen = () => {
         console.log("Connected to WebSocket");
+        socket.send(userHash);
     };
 
     socket.onmessage = (event) => {
