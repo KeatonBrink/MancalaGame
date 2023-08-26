@@ -18,7 +18,8 @@ message HandshakeResponse {
     int32 errorCode = 1;
     string errorMessage = 2;
     string message = 3;
-    string serverWebSocketAddress = 4;
+    string userHash = 4;
+    string serverWebSocketAddress = 5;
 }
 
 
@@ -28,8 +29,10 @@ message MoveRequest {
 }
 
 message MoveResponse {
-    string message = 1;
-    string board = 2;
+    int32 errorCode = 1;
+    string errorMessage = 2;
+    string message = 3;
+    string board = 4;
 }
 
 message UpdateRequest {
@@ -37,6 +40,8 @@ message UpdateRequest {
 }
 
 message UpdateResponse {
-    string message = 1;
-    string board = 2;
+    int32 errorCode = 1;
+    string errorMessage = 2;
+    string message = 3;
+    string board = 4;
 }

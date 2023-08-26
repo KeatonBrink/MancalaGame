@@ -318,7 +318,8 @@ proto.mancala.HandshakeResponse.toObject = function(includeInstance, msg) {
     errorcode: jspb.Message.getFieldWithDefault(msg, 1, 0),
     errormessage: jspb.Message.getFieldWithDefault(msg, 2, ""),
     message: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    serverwebsocketaddress: jspb.Message.getFieldWithDefault(msg, 4, "")
+    userhash: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    serverwebsocketaddress: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -368,6 +369,10 @@ proto.mancala.HandshakeResponse.deserializeBinaryFromReader = function(msg, read
       msg.setMessage(value);
       break;
     case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserhash(value);
+      break;
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setServerwebsocketaddress(value);
       break;
@@ -421,10 +426,17 @@ proto.mancala.HandshakeResponse.serializeBinaryToWriter = function(message, writ
       f
     );
   }
-  f = message.getServerwebsocketaddress();
+  f = message.getUserhash();
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getServerwebsocketaddress();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -486,10 +498,10 @@ proto.mancala.HandshakeResponse.prototype.setMessage = function(value) {
 
 
 /**
- * optional string serverWebSocketAddress = 4;
+ * optional string userHash = 4;
  * @return {string}
  */
-proto.mancala.HandshakeResponse.prototype.getServerwebsocketaddress = function() {
+proto.mancala.HandshakeResponse.prototype.getUserhash = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
@@ -498,8 +510,26 @@ proto.mancala.HandshakeResponse.prototype.getServerwebsocketaddress = function()
  * @param {string} value
  * @return {!proto.mancala.HandshakeResponse} returns this
  */
-proto.mancala.HandshakeResponse.prototype.setServerwebsocketaddress = function(value) {
+proto.mancala.HandshakeResponse.prototype.setUserhash = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string serverWebSocketAddress = 5;
+ * @return {string}
+ */
+proto.mancala.HandshakeResponse.prototype.getServerwebsocketaddress = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.HandshakeResponse} returns this
+ */
+proto.mancala.HandshakeResponse.prototype.setServerwebsocketaddress = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
@@ -695,8 +725,10 @@ proto.mancala.MoveResponse.prototype.toObject = function(opt_includeInstance) {
  */
 proto.mancala.MoveResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    message: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    board: jspb.Message.getFieldWithDefault(msg, 2, "")
+    errorcode: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    errormessage: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    message: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    board: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -734,10 +766,18 @@ proto.mancala.MoveResponse.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setErrorcode(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setErrormessage(value);
+      break;
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
       break;
-    case 2:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setBoard(value);
       break;
@@ -770,46 +810,60 @@ proto.mancala.MoveResponse.prototype.serializeBinary = function() {
  */
 proto.mancala.MoveResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMessage();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getErrorcode();
+  if (f !== 0) {
+    writer.writeInt32(
       1,
       f
     );
   }
-  f = message.getBoard();
+  f = message.getErrormessage();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getBoard();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
 /**
- * optional string message = 1;
- * @return {string}
+ * optional int32 errorCode = 1;
+ * @return {number}
  */
-proto.mancala.MoveResponse.prototype.getMessage = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.mancala.MoveResponse.prototype.getErrorcode = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /**
- * @param {string} value
+ * @param {number} value
  * @return {!proto.mancala.MoveResponse} returns this
  */
-proto.mancala.MoveResponse.prototype.setMessage = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
+proto.mancala.MoveResponse.prototype.setErrorcode = function(value) {
+  return jspb.Message.setProto3IntField(this, 1, value);
 };
 
 
 /**
- * optional string board = 2;
+ * optional string errorMessage = 2;
  * @return {string}
  */
-proto.mancala.MoveResponse.prototype.getBoard = function() {
+proto.mancala.MoveResponse.prototype.getErrormessage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -818,8 +872,44 @@ proto.mancala.MoveResponse.prototype.getBoard = function() {
  * @param {string} value
  * @return {!proto.mancala.MoveResponse} returns this
  */
-proto.mancala.MoveResponse.prototype.setBoard = function(value) {
+proto.mancala.MoveResponse.prototype.setErrormessage = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string message = 3;
+ * @return {string}
+ */
+proto.mancala.MoveResponse.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.MoveResponse} returns this
+ */
+proto.mancala.MoveResponse.prototype.setMessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string board = 4;
+ * @return {string}
+ */
+proto.mancala.MoveResponse.prototype.getBoard = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.MoveResponse} returns this
+ */
+proto.mancala.MoveResponse.prototype.setBoard = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 
@@ -985,8 +1075,10 @@ proto.mancala.UpdateResponse.prototype.toObject = function(opt_includeInstance) 
  */
 proto.mancala.UpdateResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    message: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    board: jspb.Message.getFieldWithDefault(msg, 2, "")
+    errorcode: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    errormessage: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    message: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    board: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -1024,10 +1116,18 @@ proto.mancala.UpdateResponse.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setErrorcode(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setErrormessage(value);
+      break;
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
       break;
-    case 2:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setBoard(value);
       break;
@@ -1060,46 +1160,60 @@ proto.mancala.UpdateResponse.prototype.serializeBinary = function() {
  */
 proto.mancala.UpdateResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMessage();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getErrorcode();
+  if (f !== 0) {
+    writer.writeInt32(
       1,
       f
     );
   }
-  f = message.getBoard();
+  f = message.getErrormessage();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getBoard();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
 /**
- * optional string message = 1;
- * @return {string}
+ * optional int32 errorCode = 1;
+ * @return {number}
  */
-proto.mancala.UpdateResponse.prototype.getMessage = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.mancala.UpdateResponse.prototype.getErrorcode = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /**
- * @param {string} value
+ * @param {number} value
  * @return {!proto.mancala.UpdateResponse} returns this
  */
-proto.mancala.UpdateResponse.prototype.setMessage = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
+proto.mancala.UpdateResponse.prototype.setErrorcode = function(value) {
+  return jspb.Message.setProto3IntField(this, 1, value);
 };
 
 
 /**
- * optional string board = 2;
+ * optional string errorMessage = 2;
  * @return {string}
  */
-proto.mancala.UpdateResponse.prototype.getBoard = function() {
+proto.mancala.UpdateResponse.prototype.getErrormessage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -1108,8 +1222,44 @@ proto.mancala.UpdateResponse.prototype.getBoard = function() {
  * @param {string} value
  * @return {!proto.mancala.UpdateResponse} returns this
  */
-proto.mancala.UpdateResponse.prototype.setBoard = function(value) {
+proto.mancala.UpdateResponse.prototype.setErrormessage = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string message = 3;
+ * @return {string}
+ */
+proto.mancala.UpdateResponse.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.UpdateResponse} returns this
+ */
+proto.mancala.UpdateResponse.prototype.setMessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string board = 4;
+ * @return {string}
+ */
+proto.mancala.UpdateResponse.prototype.getBoard = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.mancala.UpdateResponse} returns this
+ */
+proto.mancala.UpdateResponse.prototype.setBoard = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

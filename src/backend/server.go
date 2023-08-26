@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"hash/fnv"
 	"log"
 	"net"
 	"net/http"
@@ -31,6 +32,7 @@ type server struct {
 	man.UnimplementedMancalaServiceServer
 	waitingRoom    []string
 	allUserNames   []string
+	userHashes     map[string]string
 	gameInProgress []MancalaGameBoard
 	mu             sync.Mutex
 }
@@ -40,6 +42,17 @@ type MancalaGameBoard struct {
 	p1Row  [7]int
 	p2Name string
 	p2Row  [7]int
+	playerTurn int
+}
+
+func (mgb *MancalaGameBoard) String(player int) string {
+	if player == 1 {
+		return fmt.Sprintf("%v;%v", mgb.p1Row, mgb.p2Row)
+	} else if player == 2 {
+		return fmt.Sprintf("%v;%v", mgb.p2Row, mgb.p1Row)
+	} else {
+		return ""
+	}
 }
 
 func (mgb *MancalaGameBoard) resetBoard() {
@@ -49,10 +62,11 @@ func (mgb *MancalaGameBoard) resetBoard() {
 	}
 	mgb.p1Row[6] = 0
 	mgb.p2Row[6] = 0
+	mgb.playerTurn = 1
 }
 
 func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (*man.HandshakeResponse, error) {
-	log.Printf("Received: %v", req.GetUserName())
+	log.Printf("Received Game Handshake: %v", req.GetUserName())
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, v := range s.allUserNames {
@@ -61,17 +75,22 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 				ErrorCode:              1,
 				ErrorMessage:           "Name already in use",
 				Message:                "",
+				UserHash:               "",
 				ServerWebSocketAddress: "",
 			}, nil
 		}
 	}
 	s.allUserNames = append(s.allUserNames, req.GetUserName())
 	s.waitingRoom = append(s.waitingRoom, req.GetUserName())
+	// Hash the username and store it
+	newUserHash := fnvHash(req.GetUserName())
+	s.userHashes[req.GetUserName()] = newUserHash
 	if len(s.waitingRoom) > 1 {
 		return &man.HandshakeResponse{
 			ErrorCode:              0,
 			ErrorMessage:           "",
 			Message:                "Game Starting Soon",
+			UserHash:               newUserHash,
 			ServerWebSocketAddress: "",
 		}, nil
 	} else {
@@ -79,9 +98,70 @@ func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (
 			ErrorCode:              0,
 			ErrorMessage:           "",
 			Message:                "Waiting for Second Player",
+			UserHash:               newUserHash,
 			ServerWebSocketAddress: "8081",
 		}, nil
 	}
+}
+
+func (s *server) MakeMove(ctx context.Context, req *man.MoveRequest) (*man.MoveResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Get the user's name from user hash
+	userName := s.userHashes[req.GetUserHash()]
+	log.Printf("Received Move Request: %v", userName)
+	// Find the game board by cycling through boards in progress
+	var gameBoard MancalaGameBoard
+	player := 0
+	for i, v := range s.gameInProgress {
+		if v.p1Name == userName || v.p2Name == userName {
+			if v.p1Name == userName {
+				player = 1
+			} else {
+				player = 2
+			}
+			gameBoard = s.gameInProgress[i]
+			break
+		}
+	}
+	// Check if the game board was found
+	if gameBoard.p1Name == "" && gameBoard.p2Name == "" {
+		return &man.MoveResponse{
+			ErrorCode:    1,
+			ErrorMessage: "Game not found",
+			Message:      "",
+			Board:        "",
+		}, nil
+	}
+	// Check if the move is valid
+	// Convert int32 to int
+	move := int(req.GetPitIndex())
+	returnBoard, err := MakeMove(gameBoard, userName, move)
+	if err != nil {
+		return &man.MoveResponse{
+			ErrorCode:    3,
+			ErrorMessage: err.Error(),
+			Message:      "",
+			Board:        "",
+		}, nil
+	}
+	// Check if the game is over
+	if isGameOver(returnBoard) {
+		// Send the game over message
+		return &man.MoveResponse{
+			ErrorCode:    0,
+			ErrorMessage: "",
+			Message:      "Game Over",
+			Board:        returnBoard.String(player),
+		}, nil
+	}
+	// Send the updated board
+	return &man.MoveResponse{
+		ErrorCode:    0,
+		ErrorMessage: "",
+		Message:      "New Board",
+		Board:        returnBoard.String(player),
+	}, nil
 }
 
 func handleWebSocket(serverObj *server, w http.ResponseWriter, r *http.Request) {
@@ -143,4 +223,10 @@ func websocketSetup(serverObj *server) {
 	})
 	log.Printf("Websocket listening at %v", *wsport)
 	http.ListenAndServe(":"+strconv.Itoa(*wsport), nil)
+}
+
+func fnvHash(s string) string {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return strconv.Itoa(int(h.Sum32()))
 }
