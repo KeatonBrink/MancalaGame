@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"sync"
 
-	man "github.com/KeatonBrink/MancalaGame/src/protos"
+	man "github.com/KeatonBrink/MancalaGame/src/protos/generated"
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
 )

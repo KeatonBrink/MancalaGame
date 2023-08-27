@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	man "github.com/KeatonBrink/MancalaGame/src/protos"
+	man "github.com/KeatonBrink/MancalaGame/src/protos/generated"
 )
 
 func (s *server) GameHandshake(ctx context.Context, req *man.HandshakeRequest) (*man.HandshakeResponse, error) {
