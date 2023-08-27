@@ -35,6 +35,18 @@ pits.forEach((pit, index) => {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
                 console.log(JSON.stringify(response));
+                statusText.textContent = response.message;
+                if (response.data.message == "Game Over") {
+                    statusText.textContent = "Game Over";
+                    currentState = "Game Over";
+                    board = stringBoardTo2DArray(response.data.board);
+                    updateHTMLBoard();
+                } else if (response.data.message == "Opponent's Turn") {
+                    statusText.textContent = "Opponent Turn";
+                    currentState = "Opponent Turn";
+                    board = stringBoardTo2DArray(response.data.board);
+                    updateHTMLBoard();
+                }
             }
         };
         console.log("client.js /Makemove User Hash: " + userHash);
@@ -45,6 +57,20 @@ pits.forEach((pit, index) => {
         xhr.send(JSON.stringify(payload));
     });
 });
+
+function stringBoardTo2DArray(stringBoard) {
+    for (let i = 0; i < 2; i++) {
+        stringBoard = stringBoard.replace("[", "");
+        stringBoard = stringBoard.replace("]", "");
+    }
+    let tempBoard = stringBoard.split(";");
+    tempBoard = tempBoard.reverse();
+    tempBoard.forEach((row, index) => {
+        tempBoard[index] = row.split(" ");
+    });
+    tempBoard[0] = tempBoard[0].reverse();
+    return tempBoard;
+}
 
 const userNameSubmission = document.querySelector("#user-name-submission");
 const userNameLocation = document.getElementById("user-name");

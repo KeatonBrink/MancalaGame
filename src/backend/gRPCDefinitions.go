@@ -120,7 +120,7 @@ func (s *server) MakeMove(ctx context.Context, req *man.MoveRequest) (*man.MoveR
 	return &man.MoveResponse{
 		ErrorCode:    0,
 		ErrorMessage: "",
-		Message:      "New Board",
+		Message:      "Opponent's Turn",
 		Board:        returnBoard.String(player),
 	}, nil
 }
