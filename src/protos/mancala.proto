@@ -8,6 +8,7 @@ service MancalaService {
     rpc GameHandshake(HandshakeRequest) returns (HandshakeResponse);
     rpc MakeMove(MoveRequest) returns (MoveResponse);
     rpc RequestUpdate(UpdateRequest) returns (UpdateResponse);
+    rpc NodeGameStatus(GameStatusRequest) returns (GameStatusResponse);
 }
 
 message HandshakeRequest {
@@ -44,4 +45,21 @@ message UpdateResponse {
     string errorMessage = 2;
     string message = 3;
     string board = 4;
+}
+
+message GameStatusRequest {
+    string userHash = 1;
+}
+
+message GameStatusResponse {
+    int32 errorCode = 1;
+    string errorMessage = 2;
+    string message = 3;
+    string gameID = 4;
+    string board = 5;
+    string player1Hash = 6;
+    string player1Socket = 7;
+    string player2Hash = 8;
+    string player2Socket = 9;
+    string playerTurn = 10;
 }

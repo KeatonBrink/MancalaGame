@@ -153,6 +153,49 @@ function webSocketToServer(webSocketAddress) {
     };
 }
 
+function turnUpdateWebSocket(webSocketAddress) {
+    let url = "ws://localhost:" + webSocketAddress + "/ws?userhash=";
+    let socket = new WebSocket(url + userHash);
+
+    socket.onopen = () => {
+        console.log("Connected to Turn WebSocket");
+    };
+
+    socket.onmessage = (event) => {
+        console.log("Received: " + event.data);
+        if (currentState == "Your Turn") {
+            board = stringBoardTo2DArray(event.data);
+            updateHTMLBoard();
+        } else if (event.data == "Your Turn") {
+            statusText.textContent = "Your Turn";
+            currentState = "Your Turn";
+        } else if (event.data == "Game Over") {
+            statusText.textContent = "Game Over";
+            currentState = "Game Over";
+        } else if (event.data == "Opponent's Turn") {
+            statusText.textContent = "Opponent's Turn";
+            currentState = "Opponent's Turn";
+        } else {
+            statusText.textContent = "Sever Error";
+            currentState = "Awaiting Name";
+        }
+    };
+
+    socket.onclose = (event) => {
+        if (event.wasClean) {
+            console.log(
+                `Closed cleanly, code=${event.code}, reason=${event.reason}`
+            );
+        } else {
+            console.log("Connection died");
+        }
+    };
+
+    socket.onerror = (error) => {
+        console.log("Error: " + error.message);
+    };
+}
+
 const boardPits = document.querySelectorAll(".board-pit");
 function updateHTMLBoard() {
     boardPits.forEach((pit, index) => {

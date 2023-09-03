@@ -8,6 +8,7 @@ async function makeMoveRoute(req, res, client) {
         //Prepare the request to the gRPC server
         response = await makeMove(data.userHash, data.pitIndex, client);
         response = makeMovegRPCToJSON(response);
+        // New TODO: Handle active games with websockets
         res.status(200).json({ data: response, error: "" });
     } catch (error) {
         res.status(500).json({ error: "An error occurred" });
