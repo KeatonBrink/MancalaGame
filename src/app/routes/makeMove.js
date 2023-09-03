@@ -1,5 +1,6 @@
 var messages = require("../../protos/generated/mancala_pb");
 var services = require("../../protos/generated/mancala_grpc_pb");
+var updateMoveWebSocket = require("./updateMove");
 
 async function makeMoveRoute(req, res, client) {
     try {
@@ -28,6 +29,8 @@ async function makeMove(UserHash, Move, client) {
                 console.log(err);
                 reject(err); // Reject the promise with the error
             } else {
+                // Need to check response, if resolve, then notify other player of turn
+
                 resolve(response); // Resolve the promise with the response
             }
         });

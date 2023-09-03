@@ -1,5 +1,6 @@
 // Require the port number from app.js
 const PORT = require("../../app").port;
+const e = require("express");
 const WebSocket = require("ws");
 
 // Update Move.js handles websockets that update clients when a successful move is made
@@ -67,3 +68,19 @@ function removeActiveGame(gameID) {
     console.log("Removed active game: " + gameID);
     // TODO: Send a message to the clients that the game has ended and close websockets
 }
+
+// Need to finish this function
+function updatePlayerTurn(gameState, playerHash) {
+    if (activeGames[gameID].player1Hash == playerHash) {
+        activeGames[gameID].playerTurn = activeGames[gameID].player2Hash;
+    } else {
+        activeGames[gameID].playerTurn = activeGames[gameID].player1Hash;
+    }
+}
+
+// Export functions
+module.exports = {
+    addActiveGame: addActiveGame,
+    removeActiveGame: removeActiveGame,
+    updatePlayerTurn: updatePlayerTurn,
+};
