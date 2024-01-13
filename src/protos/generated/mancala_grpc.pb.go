@@ -25,6 +25,7 @@ type MancalaServiceClient interface {
 	GameHandshake(ctx context.Context, in *HandshakeRequest, opts ...grpc.CallOption) (*HandshakeResponse, error)
 	MakeMove(ctx context.Context, in *MoveRequest, opts ...grpc.CallOption) (*MoveResponse, error)
 	RequestUpdate(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	NodeGameStatus(ctx context.Context, in *GameStatusRequest, opts ...grpc.CallOption) (*GameStatusResponse, error)
 }
 
 type mancalaServiceClient struct {
@@ -62,6 +63,15 @@ func (c *mancalaServiceClient) RequestUpdate(ctx context.Context, in *UpdateRequ
 	return out, nil
 }
 
+func (c *mancalaServiceClient) NodeGameStatus(ctx context.Context, in *GameStatusRequest, opts ...grpc.CallOption) (*GameStatusResponse, error) {
+	out := new(GameStatusResponse)
+	err := c.cc.Invoke(ctx, "/mancala.MancalaService/NodeGameStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MancalaServiceServer is the server API for MancalaService service.
 // All implementations must embed UnimplementedMancalaServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type MancalaServiceServer interface {
 	GameHandshake(context.Context, *HandshakeRequest) (*HandshakeResponse, error)
 	MakeMove(context.Context, *MoveRequest) (*MoveResponse, error)
 	RequestUpdate(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	NodeGameStatus(context.Context, *GameStatusRequest) (*GameStatusResponse, error)
 	mustEmbedUnimplementedMancalaServiceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedMancalaServiceServer) MakeMove(context.Context, *MoveRequest)
 }
 func (UnimplementedMancalaServiceServer) RequestUpdate(context.Context, *UpdateRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestUpdate not implemented")
+}
+func (UnimplementedMancalaServiceServer) NodeGameStatus(context.Context, *GameStatusRequest) (*GameStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeGameStatus not implemented")
 }
 func (UnimplementedMancalaServiceServer) mustEmbedUnimplementedMancalaServiceServer() {}
 
@@ -152,6 +166,24 @@ func _MancalaService_RequestUpdate_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MancalaService_NodeGameStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GameStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MancalaServiceServer).NodeGameStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mancala.MancalaService/NodeGameStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MancalaServiceServer).NodeGameStatus(ctx, req.(*GameStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MancalaService_ServiceDesc is the grpc.ServiceDesc for MancalaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var MancalaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RequestUpdate",
 			Handler:    _MancalaService_RequestUpdate_Handler,
+		},
+		{
+			MethodName: "NodeGameStatus",
+			Handler:    _MancalaService_NodeGameStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

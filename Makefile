@@ -3,8 +3,8 @@
 all: clean proto backend
 
 clean:
-	rm src/protos/mancala_grpc.pb.go
-	rm src/protos/mancala.pb.go
+	rm src/protos/generated/mancala_grpc.pb.go
+	rm src/protos/generated/mancala.pb.go
 	rm src/protos/generated/mancala_grpc_pb.js
 	rm src/protos/generated/mancala_pb.js
 	rm src/backend/backend

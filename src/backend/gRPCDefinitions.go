@@ -89,7 +89,7 @@ func (s *server) MakeMove(ctx context.Context, req *man.MoveRequest) (*man.MoveR
 	// Check if the move is valid
 	// Convert int32 to int
 	move := int(req.GetPitIndex())
-	returnBoard, err := MakeMove(gameBoard, userName, move)
+	err := gameBoard.MakeMove(userName, move)
 	if err != nil {
 		return &man.MoveResponse{
 			ErrorCode:    3,
@@ -99,28 +99,28 @@ func (s *server) MakeMove(ctx context.Context, req *man.MoveRequest) (*man.MoveR
 		}, nil
 	}
 	// Check if the game is over
-	if isGameOver(returnBoard) {
+	if gameBoard.isGameOver() {
 		// Send the game over message
 		return &man.MoveResponse{
 			ErrorCode:    0,
 			ErrorMessage: "",
 			Message:      "Game Over",
-			Board:        returnBoard.String(player),
+			Board:        gameBoard.String(player),
 		}, nil
 	}
 	// Change player turn
-	if returnBoard.playerTurn == 1 {
-		returnBoard.playerTurn = 2
+	if gameBoard.playerTurn == 1 {
+		gameBoard.playerTurn = 2
 	} else {
-		returnBoard.playerTurn = 1
+		gameBoard.playerTurn = 1
 	}
-	s.gamesInProgress[gameInProgressIndex] = returnBoard
-	log.Printf("Valid Move, Sending New Board: %v", returnBoard.String(player))
+	s.gamesInProgress[gameInProgressIndex] = gameBoard
+	log.Printf("Valid Move, Sending New Board: %v", gameBoard.String(player))
 	// Send the updated board
 	return &man.MoveResponse{
 		ErrorCode:    0,
 		ErrorMessage: "",
 		Message:      "Opponent's Turn",
-		Board:        returnBoard.String(player),
+		Board:        gameBoard.String(player),
 	}, nil
 }

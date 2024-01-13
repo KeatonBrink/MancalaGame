@@ -4,6 +4,28 @@
 var grpc = require('@grpc/grpc-js');
 var mancala_pb = require('./mancala_pb.js');
 
+function serialize_mancala_GameStatusRequest(arg) {
+  if (!(arg instanceof mancala_pb.GameStatusRequest)) {
+    throw new Error('Expected argument of type mancala.GameStatusRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_mancala_GameStatusRequest(buffer_arg) {
+  return mancala_pb.GameStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_mancala_GameStatusResponse(arg) {
+  if (!(arg instanceof mancala_pb.GameStatusResponse)) {
+    throw new Error('Expected argument of type mancala.GameStatusResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_mancala_GameStatusResponse(buffer_arg) {
+  return mancala_pb.GameStatusResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_mancala_HandshakeRequest(arg) {
   if (!(arg instanceof mancala_pb.HandshakeRequest)) {
     throw new Error('Expected argument of type mancala.HandshakeRequest');
@@ -104,6 +126,17 @@ var MancalaServiceService = exports.MancalaServiceService = {
     requestDeserialize: deserialize_mancala_UpdateRequest,
     responseSerialize: serialize_mancala_UpdateResponse,
     responseDeserialize: deserialize_mancala_UpdateResponse,
+  },
+  nodeGameStatus: {
+    path: '/mancala.MancalaService/NodeGameStatus',
+    requestStream: false,
+    responseStream: false,
+    requestType: mancala_pb.GameStatusRequest,
+    responseType: mancala_pb.GameStatusResponse,
+    requestSerialize: serialize_mancala_GameStatusRequest,
+    requestDeserialize: deserialize_mancala_GameStatusRequest,
+    responseSerialize: serialize_mancala_GameStatusResponse,
+    responseDeserialize: deserialize_mancala_GameStatusResponse,
   },
 };
 
