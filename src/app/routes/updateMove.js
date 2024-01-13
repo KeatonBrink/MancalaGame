@@ -1,5 +1,5 @@
 // Require the port number from app.js
-const PORT = require("../../app").port;
+const PORT = require("../../../app").port;
 const e = require("express");
 const WebSocket = require("ws");
 
